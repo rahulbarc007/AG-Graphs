@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "msrnx"
+version = "1.0.0"
+description = "AI/ML-augmented neutronics design framework for molten salt reactors"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26", "scipy>=1.11", "matplotlib>=3.8", "scikit-learn>=1.4"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pandas>=2.0"]
+
+[tool.setuptools.packages.find]
+include = ["msrnx*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
