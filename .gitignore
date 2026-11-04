@@ -6,3 +6,7 @@ build/
 dist/
 results/report.html
 results/*/dataset.npz
+# neural-network burnup framework: regenerable data sets and CLI runs
+results/*/physics_dataset.csv
+results/*/hf_core2d_dataset.csv
+runs/

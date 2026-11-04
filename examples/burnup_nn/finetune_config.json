@@ -1,0 +1,50 @@
+{
+  "_about": "Adapt the trained study-11 model to runs of another code. Usage: python -m msrnx.burnup_nn finetune examples/burnup_nn/finetune_config.json --model results/11_burnup_neural_network/model [--method auto|correction|weights]. 'auto' uses the discrepancy correction below 12 training cases, weight fine-tuning above.",
+  "title": "Fine-tuning on external runs",
+  "data": [
+    {
+      "path": "sample_user_data.csv",
+      "source": "external-code",
+      "weight": 3.0,
+      "constants": {},
+      "rename": {
+        "run": "case_id",
+        "EFPD": "time_days",
+        "keff": "k_eff",
+        "BR": "breeding_ratio",
+        "BU": "burnup_MWd_kgHM",
+        "U233_g": "U233_kg",
+        "U235_g": "U235_kg",
+        "Pa233_g": "Pa233_kg"
+      },
+      "scale": {
+        "U233_kg": 0.001,
+        "U235_kg": 0.001,
+        "Pa233_kg": 0.001
+      }
+    }
+  ],
+  "features": [
+    "uf4_pct",
+    "thf4_pct",
+    "salt_fraction",
+    "power_MW",
+    "re_removal_days",
+    "pa_removal_days",
+    "xe_removal_s"
+  ],
+  "targets": [
+    "k_eff",
+    "breeding_ratio",
+    "burnup_MWd_kgHM",
+    "U233_kg",
+    "U235_kg",
+    "Pa233_kg"
+  ],
+  "split": {
+    "test": 0.25,
+    "val": 0.0,
+    "seed": 0
+  },
+  "output_dir": "../../runs/burnup_nn_finetuned"
+}

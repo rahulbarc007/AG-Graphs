@@ -8,6 +8,12 @@ thousands of times faster**: uncertainty-aware surrogates, active learning,
 physics-guarded prediction, multi-fidelity correction, parameter reduction,
 reduced-order models, uncertainty quantification and Bayesian optimization.
 
+A **neural-network burnup framework** (`msrnx.burnup_nn`) learns complete depletion
+trajectories (k_eff, breeding ratio, burnup, actinide and poison inventories) from the
+built-in physics runs **and from your own data** (Serpent, SCALE, OpenMC, in-house
+codes), with a JSON-configured command line - see
+[Neural-network burnup framework](#neural-network-burnup-framework--add-your-own-data).
+
 Every study prints its results as tables **and** saves charts; `examples/run_all.py`
 assembles everything into [`results/REPORT.md`](results/REPORT.md) (renders on GitHub)
 and a self-contained `results/report.html`.
@@ -31,6 +37,7 @@ and a self-contained `results/report.html`.
 | Poisons | Xe-135 / Sm-149 equilibrium and transients with **He sparging** and rare-earth removal; transport-calibrated worths | `msrnx.poisons` |
 | Burnup | Depletion chain from the database, **CRAM-16** matrix exponential, CE/CM predictor–corrector, **online reprocessing** (sparging, plate-out, rare-earth extraction, Pa decay tank, salt discard), criticality-controlled fissile feed / extraction, fertile make-up, breeding ratio, tritium | `msrnx.depletion` |
 | AI / ML | GP (ARD Matérn), deep-ensemble MLP, gradient boosting, polynomial ridge; CV model selection; **IMSE active learning**; **physics-guarded hybrid predictor**; **multi-fidelity** HF/LF discrepancy learning; **Sobol, Morris, active subspaces**; **POD ROM**; cross-section functionalization (PCA); nuclear-data sensitivity & UQ; **constrained Bayesian optimization**; **ML-accelerated depletion** | `msrnx.ml` |
+| Neural-network burnup | Deep-ensemble networks (pure NumPy, analytic back-propagation, L-BFGS / AdamW) learn burnup trajectories vs design parameters and time; **physics-informed multi-timescale time encoding**, log-space inventories, **monotonicity constraints**, non-negativity guard, **masked multi-source loss** (merge codes reporting different outputs), calibrated uncertainty, **transfer learning** (fine-tuning with L2-SP anchoring), cycle-length / discharge-burnup search, sensitivities, learning curves; CSV/Excel/JSON loaders with column mapping and unit scaling; JSON-configured CLI with charts and reports | `msrnx.burnup_nn` |
 
 ## Quick start
 
@@ -47,13 +54,13 @@ print(r.summary())                     # k_eff, beta_eff, Lambda, CR, peaking, g
 ```bash
 python examples/run_all.py             # every study + REPORT.md / report.html (~20 min, 4 cores)
 python examples/run_all.py 03 07       # selected studies
-python -m pytest                       # 68 verification tests (~25 s)
+python -m pytest                       # 93 verification tests (~45 s)
 ```
 
 The 45-group library is generated on first use (~6 s on 4 cores) and cached in
 `~/.cache/msrnx` (override with `MSRNX_CACHE`).
 
-## The ten studies
+## The eleven studies
 
 | # | Study | Highlights |
 |---|---|---|
@@ -67,6 +74,7 @@ The 45-group library is generated on first use (~6 s on 4 cores) and cached in
 | 08 | [ML surrogates](examples/08_ml_surrogates.py) | CV model comparison, parity with uncertainty, active learning, multi-fidelity, guarded hybrid, speed-up |
 | 09 | [Parameter reduction](examples/09_parameter_reduction.py) | Sobol, Morris, active subspace, reduced-input surrogates, POD ROM, XS functionalization |
 | 10 | [UQ & optimization](examples/10_uq_optimization.py) | nuclear-data sensitivities, tolerance Monte Carlo, constrained Bayesian optimization, verified Pareto front |
+| 11 | [Neural-network burnup](examples/11_burnup_neural_network.py) | deep-ensemble burnup trajectories, accuracy and calibrated uncertainty on unseen designs, learning curve, physics-informed time encoding, transfer learning to a higher-fidelity code, discharge-burnup design map, sensitivities |
 
 ![ML learning curves](results/08_ml_surrogates/learning_curves.png)
 
@@ -124,6 +132,41 @@ The 45-group library is generated on first use (~6 s on 4 cores) and cached in
 * **Energy-group condensation** with spectral-zone spectra (45 → 2–8 groups).
 * **POD** compresses spatial fields; **PCA functionalization** compresses few-group cross-section tables.
 
+## Neural-network burnup framework — add your own data
+
+`msrnx.burnup_nn` turns depletion results into a neural network that returns a complete
+burnup trajectory (k_eff, breeding ratio, burnup, U-232…U-235, Pa-233, Np-237, Xe/Sm/FP
+poisoning) **with an uncertainty band in milliseconds**. It trains on the built-in
+MSR-NX runs, on **your own data** (one row per case and time point, CSV/Excel/JSON,
+any column names and units via `rename`/`scale`), or on both merged; blank cells are
+allowed, so codes reporting different nuclides can be combined. Networks are pure
+NumPy, so no deep-learning framework is needed. User guide: **[docs/BURNUP_NN.md](docs/BURNUP_NN.md)**.
+
+```bash
+python -m msrnx.burnup_nn template --out my_runs.csv               # columns to fill with your results
+python -m msrnx.burnup_nn generate --cases 400 --out results/11_burnup_neural_network/physics_dataset.csv
+python -m msrnx.burnup_nn check   examples/burnup_nn/config.json   # validate merged data
+python -m msrnx.burnup_nn train   examples/burnup_nn/config.json   # model + charts + REPORT.md
+python -m msrnx.burnup_nn predict --model results/11_burnup_neural_network/model \
+       --input new_designs.csv --crossing-target k_eff            # trajectories + cycle length
+python -m msrnx.burnup_nn finetune examples/burnup_nn/finetune_config.json \
+       --model results/11_burnup_neural_network/model             # adapt to your high-fidelity runs
+```
+
+Results of [study 11](examples/11_burnup_neural_network.py) (thorium MSR, 400 designs × 26 burnup
+steps to 8.6 years, 7 design and processing parameters, 12 outputs):
+
+| Result | Value |
+|---|---|
+| k_eff on 50 unseen designs (range 0.75–1.69) | **84 pcm RMSE** (max 533 pcm) |
+| All 12 outputs | mean R² = 0.9999, mean RMSE = 0.16 % of range |
+| Calibrated 95 % intervals | 97 % observed coverage |
+| Physics-informed time encoding | 195 pcm vs 937 pcm with plain time (all 300 cases); beats the plain-time full-data error already with 80 cases |
+| Adding 2 / 8 runs of another code (2D-core depletion) | k_eff error vs that code: built-in network alone 241 pcm; + discrepancy correction 198 / 188 pcm; + weight fine-tuning 373 / 176 pcm; a network trained from scratch on those runs 16,274 / 9,904 pcm |
+| Cost of one trajectory | 1.3 ms (physics depletion: 1.2 s) |
+
+![Discharge burnup map](results/11_burnup_neural_network/discharge_burnup_map.png)
+
 ## Limitations — read before using results
 
 * The built-in nuclear data are **representative, synthesized from well-known
@@ -150,7 +193,12 @@ msrnx/
   depletion/    chain + reprocessing, CRAM-16, burnup driver
   ml/           design space, surrogates, active learning, sensitivity, ROM,
                 multi-fidelity, UQ, optimization, XS functionalization, ML depletion
-examples/       10 studies + run_all.py (tables + charts + reports)
-tests/          68 verification tests
+  burnup_nn/    neural-network burnup framework: data sets and loaders, NumPy
+                networks, physics-informed model, physics data generator, charts,
+                config-driven pipeline, command line (python -m msrnx.burnup_nn)
+examples/       11 studies + run_all.py (tables + charts + reports)
+  burnup_nn/    example config, sample external data, data template, new designs
+docs/           BURNUP_NN.md - user guide for adding your own data
+tests/          93 verification tests
 results/        figures, study.json files, REPORT.md
 ```

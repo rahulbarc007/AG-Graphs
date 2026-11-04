@@ -1,6 +1,6 @@
 # MSR-NX Neutronics Design Report
 
-_Generated 2026-11-04 03:09 by `examples/run_all.py`._
+_Generated 2026-11-04 07:19 by `examples/run_all.py`._
 
 ## Contents
 - [1. Nuclear data and the 45-group library](#1-nuclear-data-and-the-45-group-library)
@@ -13,6 +13,7 @@ _Generated 2026-11-04 03:09 by `examples/run_all.py`._
 - [8. AI/ML surrogate modelling with accuracy control](#8-aiml-surrogate-modelling-with-accuracy-control)
 - [9. Parameter reduction and reduced-order modelling](#9-parameter-reduction-and-reduced-order-modelling)
 - [10. Uncertainty quantification and design optimization](#10-uncertainty-quantification-and-design-optimization)
+- [11. Neural-network burnup framework](#11-neural-network-burnup-framework)
 
 ## 1. Nuclear data and the 45-group library
 
@@ -535,3 +536,132 @@ Direct-perturbation sensitivities on the full 2D core, Monte Carlo propagation t
 
 ![Every extra unit of breeding costs fissile inventory; the 2D solver confirms the feasible optima, and both model and physics agree that CR >= 1.14 cannot be reached with k_eff >= 1.02 in this design space.](10_uq_optimization/pareto.png)
 *Every extra unit of breeding costs fissile inventory; the 2D solver confirms the feasible optima, and both model and physics agree that CR >= 1.14 cannot be reached with k_eff >= 1.02 in this design space.*
+
+## 11. Neural-network burnup framework
+
+Deep-ensemble neural networks learn complete burnup trajectories of a thorium MSR (12 outputs vs 7 design/processing parameters and time) from MSR-NX depletion runs; new data from other codes are added by merging, a discrepancy correction or fine-tuning.
+
+**Design space of the training data (Latin hypercube)**
+
+| parameter | low | high | scale |
+|---|---|---|---|
+| UF4 (U-233) [mol%] | 0.2 | 0.6 | linear |
+| ThF4 [mol%] | 6 | 14 | linear |
+| Salt volume fraction | 0.1 | 0.3 | linear |
+| Thermal power [MW] | 400 | 2000 | linear |
+| Rare-earth removal time [d] | 20 | 2000 | log |
+| Pa removal time [d] | 3 | 3000 | log |
+| Xe sparging time [s] | 20 | 20000 | log |
+
+**Data sets**
+
+| data set | transport | cases | time points | span [d] | rows |
+|---|---|---|---|---|---|
+| built-in training data | 2D-calibrated lattice + B1 | 400 | 26 | 3150 | 10400 |
+| 'external code' data | 2D R-Z diffusion every step | 32 | 13 | 2940 | 416 |
+
+**Accuracy on 50 unseen designs (1300 points)**
+
+| output | RMSE | max \|error\| | R2 | RMSE [% of range] | 95% coverage |
+|---|---|---|---|---|---|
+| k_eff | 84 pcm | 533 pcm | 0.99998 | 0.10 | 0.94 |
+| breeding_ratio | 0.001798 | 0.01792 | 0.99994 | 0.17 | 0.94 |
+| burnup_MWd_kgHM | 0.1349 | 2.021 | 0.99999 | 0.06 | 1.00 |
+| U233_kg | 2.949 | 28.02 | 0.99995 | 0.14 | 0.95 |
+| U235_kg | 0.1242 | 1.244 | 0.99997 | 0.09 | 0.99 |
+| Pa233_kg | 0.2396 | 3.805 | 0.99984 | 0.28 | 0.96 |
+| U234_kg | 0.2713 | 2.832 | 0.99999 | 0.08 | 0.99 |
+| U232_kg | 0.001208 | 0.01946 | 0.99969 | 0.21 | 0.99 |
+| Np237_kg | 0.02563 | 0.4445 | 0.99971 | 0.21 | 1.00 |
+| Xe135_abs_pct | 0.006407 | 0.04228 | 0.99978 | 0.38 | 0.99 |
+| Sm149_abs_pct | 0.0007803 | 0.00466 | 0.99997 | 0.16 | 0.97 |
+| FP_abs_pct | 0.01809 | 0.2414 | 0.99995 | 0.11 | 0.97 |
+
+**Learning curve (single network, test designs)**
+
+| training cases | k_eff RMSE multiscale [pcm] | k_eff RMSE plain time [pcm] | mean nRMSE multiscale [%] | mean nRMSE plain time [%] |
+|---|---|---|---|---|
+| 10 | 10565 | 10046 | 11.301 | 13.441 |
+| 20 | 5212 | 7894 | 6.034 | 10.354 |
+| 40 | 2092 | 3383 | 2.78 | 5.782 |
+| 80 | 530 | 1075 | 0.964 | 2.944 |
+| 160 | 257 | 1035 | 0.396 | 2.126 |
+| 300 | 195 | 937 | 0.321 | 2.167 |
+
+**Adding runs of another code: k_eff RMSE [pcm] / mean RMSE [% of range] on 8 held-out 2D-core designs**
+
+| new runs | built-in model only | + discrepancy correction | + weight fine-tuning | from scratch |
+|---|---|---|---|---|
+| 2 | 241 / 0.45 | 198 / 0.40 | 373 / 0.57 | 16274 / 22.45 |
+| 4 | 241 / 0.45 | 195 / 0.39 | 247 / 0.50 | 13591 / 29.14 |
+| 8 | 241 / 0.45 | 188 / 0.39 | 176 / 0.41 | 9904 / 18.41 |
+| 16 | 241 / 0.45 | 180 / 0.36 | 184 / 0.34 | 5590 / 7.60 |
+| 24 | 241 / 0.45 | 175 / 0.37 | 194 / 0.27 | 3652 / 5.57 |
+
+**Discharge burnup map: physics checks (k_eff = 1 crossing, nominal other parameters)**
+
+| UF4 [mol%] | ThF4 [mol%] | k_eff BOL | cycle physics [y] | cycle NN [y] | burnup physics [MWd/kgHM] | burnup NN [MWd/kgHM] |
+|---|---|---|---|---|---|---|
+| 0.30 | 8.0 | 1.3278 | 4.86 | 4.82 +/- 0.01 | 60.4 | 59.9 +/- 0.1 |
+| 0.35 | 12.0 | 1.2252 | 6.99 | 7.02 +/- 0.06 | 62.9 | 63.1 +/- 0.5 |
+| 0.45 | 7.0 | 1.5240 | 6.81 | 6.78 +/- 0.02 | 92.8 | 92.4 +/- 0.3 |
+| 0.50 | 11.0 | 1.3986 | - | - | - | - |
+| 0.55 | 13.0 | 1.3700 | - | - | - | - |
+
+**Spot check of a sensitivity: Pa removal time (nominal design), physics vs network**
+
+| Pa removal [d] | time [d] | k_eff physics | k_eff NN | BR physics | BR NN | Pa-233 physics [kg] | Pa-233 NN [kg] |
+|---|---|---|---|---|---|---|---|
+| 3 | 1590 | 1.05274 | 1.05300 | 0.9072 | 0.9076 | 2.7 | 2.6 |
+| 30 | 1590 | 1.04542 | 1.04551 | 0.9074 | 0.9076 | 16.5 | 16.6 |
+| 300 | 1590 | 1.03653 | 1.03654 | 0.9076 | 0.9083 | 33.5 | 33.5 |
+| 3000 | 1590 | 1.03449 | 1.03449 | 0.9077 | 0.9081 | 37.3 | 37.3 |
+
+**Computing cost**
+
+| task | time |
+|---|---|
+| generate built-in data (400 cases, 4 processes) | cached |
+| train 4-member ensemble (4 processes) | 434 s |
+| one depletion trajectory, physics | 1.18 s |
+| one depletion trajectory, network (200 times, mean + sigma) | 1.3 ms |
+| discharge-burnup map (1443 designs) | 9.5 s (physics: ~28 min) |
+
+![Burnup trajectories of the built-in data set; colour = UF4 (U-233) content.](11_burnup_neural_network/training_data.png)
+*Burnup trajectories of the built-in data set; colour = UF4 (U-233) content.*
+
+![L-BFGS training; each member keeps the weights with the lowest validation loss.](11_burnup_neural_network/training_history.png)
+*L-BFGS training; each member keeps the weights with the lowest validation loss.*
+
+![Every output of every time point of the test designs.](11_burnup_neural_network/parity.png)
+*Every output of every time point of the test designs.*
+
+![RMSE as a percentage of each output's range; R2 in the labels.](11_burnup_neural_network/accuracy.png)
+*RMSE as a percentage of each output's range; R2 in the labels.*
+
+![Symmetric-log time axis: the first days (Xe-135 rising to its sparging-limited equilibrium, Pa-233 build-up) and the multi-year trends are both visible; the network follows the physics at every time scale.](11_burnup_neural_network/trajectories.png)
+*Symmetric-log time axis: the first days (Xe-135 rising to its sparging-limited equilibrium, Pa-233 build-up) and the multi-year trends are both visible; the network follows the physics at every time scale.*
+
+![Errors are spread evenly along the trajectory; the widest band is Xe-135 absorption during its first-day build-up.](11_burnup_neural_network/error_vs_time.png)
+*Errors are spread evenly along the trajectory; the widest band is Xe-135 absorption during its first-day build-up.*
+
+![Calibrated on the validation designs, the 95% intervals cover 97% of unseen points, and a larger predicted sigma means a larger actual error.](11_burnup_neural_network/uncertainty_calibration.png)
+*Calibrated on the validation designs, the 95% intervals cover 97% of unseen points, and a larger predicted sigma means a larger actual error.*
+
+![k_eff error falls from 10565 to 195 pcm as cases are added (10 to 300); a plain time input reaches 937 pcm with all cases, which the multi-timescale encoding already beats with 80 cases.](11_burnup_neural_network/learning_curve.png)
+*k_eff error falls from 10565 to 195 pcm as cases are added (10 to 300); a plain time input reaches 937 pcm with all cases, which the multi-timescale encoding already beats with 80 cases.*
+
+![With 8 runs of the other code: built-in network 241 pcm, + discrepancy correction 188 pcm, + weight fine-tuning 176 pcm; a network trained from scratch on the same 8 runs 9,904 pcm. The built-in lattice model is already close to 2D-core depletion, so the gain from correction is modest here; a code with different nuclear data would differ much more.](11_burnup_neural_network/transfer_learning.png)
+*With 8 runs of the other code: built-in network 241 pcm, + discrepancy correction 188 pcm, + weight fine-tuning 176 pcm; a network trained from scratch on the same 8 runs 9,904 pcm. The built-in lattice model is already close to 2D-core depletion, so the gain from correction is modest here; a code with different nuclear data would differ much more.*
+
+![Held-out designs of the other code, predicted by the corrected network.](11_burnup_neural_network/transfer_trajectories.png)
+*Held-out designs of the other code, predicted by the corrected network.*
+
+![Discharge burnup grows with the U-233 loading. In lean salts more thorium lowers it (the core starts closer to k = 1); rich, thorium-heavy salts stay critical beyond the 8.6-year span. The uncertainty is largest where k_eff starts close to 1; the physics checks agree within 1 %.](11_burnup_neural_network/discharge_burnup_map.png)
+*Discharge burnup grows with the U-233 loading. In lean salts more thorium lowers it (the core starts closer to k = 1); rich, thorium-heavy salts stay critical beyond the 8.6-year span. The uncertainty is largest where k_eff starts close to 1; the physics checks agree within 1 %.*
+
+![Power (burnup accumulated by 1500 days) and U-233 loading dominate reactivity; slower rare-earth, Pa and Xe removal each cost reactivity. Breeding rises as U-233 burns down and with more thorium; Pa removal barely changes the capture-based breeding ratio (checked against physics below).](11_burnup_neural_network/sensitivities.png)
+*Power (burnup accumulated by 1500 days) and U-233 loading dominate reactivity; slower rare-earth, Pa and Xe removal each cost reactivity. Breeding rises as U-233 burns down and with more thorium; Pa removal barely changes the capture-based breeding ratio (checked against physics below).*
+
+![Headline numbers of the trained model.](11_burnup_neural_network/summary.png)
+*Headline numbers of the trained model.*

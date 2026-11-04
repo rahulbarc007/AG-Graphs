@@ -8,10 +8,15 @@ version = "1.0.0"
 description = "AI/ML-augmented neutronics design framework for molten salt reactors"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["numpy>=1.26", "scipy>=1.11", "matplotlib>=3.8", "scikit-learn>=1.4"]
+dependencies = ["numpy>=1.26", "scipy>=1.11", "matplotlib>=3.8", "scikit-learn>=1.4",
+                "pandas>=2.0"]
+
+[project.scripts]
+msrnx-burnup = "msrnx.burnup_nn.__main__:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0", "pandas>=2.0"]
+dev = ["pytest>=7.0"]
+excel = ["openpyxl>=3.1"]
 
 [tool.setuptools.packages.find]
 include = ["msrnx*"]

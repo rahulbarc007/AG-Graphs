@@ -75,16 +75,27 @@ class Study:
         print(f"  [saved] {os.path.join(self.outdir, 'study.json')}")
 
 
-def build_html_report(results_dir: str, out_path: str, title: str = "MSR-NX Neutronics Report"):
-    """Assemble every study.json under ``results_dir`` into one HTML report."""
+def _collect_studies(results_dir: str, study_dirs=None) -> list:
+    """study.json bundles from the sub-folders of ``results_dir`` (or from an
+    explicit list of folders)."""
+    dirs = (list(study_dirs) if study_dirs is not None else
+            [os.path.join(results_dir, d) for d in sorted(os.listdir(results_dir))])
     studies = []
-    for d in sorted(os.listdir(results_dir)):
-        p = os.path.join(results_dir, d, "study.json")
+    for d in dirs:
+        p = os.path.join(d, "study.json")
         if os.path.exists(p):
             with open(p) as f:
                 s = json.load(f)
-            s["_dir"] = os.path.join(results_dir, d)
+            s["_dir"] = d
             studies.append(s)
+    return studies
+
+
+def build_html_report(results_dir: str, out_path: str, title: str = "MSR-NX Neutronics Report",
+                      study_dirs=None):
+    """Assemble every study.json under ``results_dir`` (or in ``study_dirs``)
+    into one self-contained HTML report."""
+    studies = _collect_studies(results_dir, study_dirs)
     parts = [f"<!doctype html><html><head><meta charset='utf-8'><title>{html.escape(title)}</title>",
              "<style>body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f9f9f7;"
              "color:#0b0b0b;margin:0;padding:24px;max-width:1100px;margin:auto}"
@@ -121,20 +132,14 @@ def _md_escape(text: str) -> str:
 
 
 def build_markdown_report(results_dir: str, out_path: str,
-                          title: str = "MSR-NX Neutronics Design Report") -> str:
-    """Assemble every study.json under ``results_dir`` into a Markdown report
-    (figures linked relatively, so it renders on GitHub)."""
+                          title: str = "MSR-NX Neutronics Design Report", study_dirs=None,
+                          generator: str = "examples/run_all.py") -> str:
+    """Assemble every study.json under ``results_dir`` (or in ``study_dirs``)
+    into a Markdown report (figures linked relatively, so it renders on GitHub)."""
     base = os.path.dirname(os.path.abspath(out_path))
     lines = [f"# {title}", "",
-             f"_Generated {_dt.datetime.now():%Y-%m-%d %H:%M} by `examples/run_all.py`._", ""]
-    studies = []
-    for d in sorted(os.listdir(results_dir)):
-        p = os.path.join(results_dir, d, "study.json")
-        if os.path.exists(p):
-            with open(p) as f:
-                s = json.load(f)
-            s["_dir"] = os.path.join(results_dir, d)
-            studies.append(s)
+             f"_Generated {_dt.datetime.now():%Y-%m-%d %H:%M} by `{generator}`._", ""]
+    studies = _collect_studies(results_dir, study_dirs)
     lines.append("## Contents")
     for s in studies:
         anchor = s["title"].lower()

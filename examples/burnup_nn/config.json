@@ -1,0 +1,87 @@
+{
+  "_about": "Train a burnup network on the built-in MSR-NX physics data plus runs from another code. Add your own files to 'data' (one row per case and time point; see docs/BURNUP_NN.md). Keys starting with '_' are comments.",
+  "_fidelity": "'fidelity' is a constant added per file (0 = built-in lattice model, 1 = external code): the network learns the difference between the codes instead of averaging them. Predict with fidelity = 1 to get answers at the level of the external code.",
+  "title": "Thorium MSR burnup network: built-in physics + external runs",
+  "data": [
+    {
+      "path": "../../results/11_burnup_neural_network/physics_dataset.csv",
+      "source": "msrnx-lattice",
+      "constants": {
+        "fidelity": 0.0
+      }
+    },
+    {
+      "path": "sample_user_data.csv",
+      "source": "external-code",
+      "weight": 3.0,
+      "constants": {
+        "fidelity": 1.0
+      },
+      "rename": {
+        "run": "case_id",
+        "EFPD": "time_days",
+        "keff": "k_eff",
+        "BR": "breeding_ratio",
+        "BU": "burnup_MWd_kgHM",
+        "U233_g": "U233_kg",
+        "U235_g": "U235_kg",
+        "Pa233_g": "Pa233_kg"
+      },
+      "scale": {
+        "U233_kg": 0.001,
+        "U235_kg": 0.001,
+        "Pa233_kg": 0.001
+      }
+    }
+  ],
+  "case_column": "case_id",
+  "time_column": "time_days",
+  "features": [
+    "uf4_pct",
+    "thf4_pct",
+    "salt_fraction",
+    "power_MW",
+    "re_removal_days",
+    "pa_removal_days",
+    "xe_removal_s",
+    "fidelity"
+  ],
+  "targets": [
+    "k_eff",
+    "breeding_ratio",
+    "burnup_MWd_kgHM",
+    "U233_kg",
+    "U235_kg",
+    "Pa233_kg",
+    "Xe135_abs_pct",
+    "FP_abs_pct"
+  ],
+  "monotonic": {
+    "burnup_MWd_kgHM": "increasing",
+    "FP_abs_pct": "increasing"
+  },
+  "model": {
+    "hidden": [
+      64,
+      64,
+      64
+    ],
+    "activation": "tanh",
+    "ensemble": 4,
+    "max_iter": 3000
+  },
+  "split": {
+    "test": 0.1,
+    "val": 0.1,
+    "seed": 0
+  },
+  "crossing": {
+    "target": "k_eff",
+    "level": 1.0,
+    "burnup_target": "burnup_MWd_kgHM"
+  },
+  "plots": {
+    "color_by": "uf4_pct"
+  },
+  "output_dir": "../../runs/burnup_nn_demo"
+}

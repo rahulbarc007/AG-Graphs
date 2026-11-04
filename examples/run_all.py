@@ -1,6 +1,6 @@
 """Run every example study and assemble the consolidated reports.
 
-    python examples/run_all.py            # all studies (~20 min on 4 cores)
+    python examples/run_all.py            # all studies (~35 min on 4 cores)
     python examples/run_all.py 01 03 07   # selected studies
 
 Outputs: results/<study>/*.png, results/<study>/study.json,
@@ -19,7 +19,8 @@ from msrnx.report import build_html_report, build_markdown_report  # noqa: E402
 
 STUDIES = ["01_nuclear_data", "02_lattice_physics", "03_core_analysis", "04_reactivity_control",
            "05_kinetics_transients", "06_xenon_samarium", "07_burnup_depletion",
-           "08_ml_surrogates", "09_parameter_reduction", "10_uq_optimization"]
+           "08_ml_surrogates", "09_parameter_reduction", "10_uq_optimization",
+           "11_burnup_neural_network"]
 
 
 def main(selected):
