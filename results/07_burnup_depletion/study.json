@@ -1,0 +1,117 @@
+{
+  "name": "07_burnup_depletion",
+  "title": "7. Burnup and depletion with online fuel processing",
+  "description": "CE/CM predictor-corrector with CRAM-16, 2D-calibrated lattice transport, fissile feed/extraction to hold k_eff = 1 and fertile make-up.",
+  "figures": [
+    [
+      "msbr_fuel_cycle.png",
+      "Only with rare-earth removal and Pa isolation does the thorium core breed (BR > 1) and produce surplus U-233."
+    ],
+    [
+      "fp_poisoning.png",
+      "Sparging removes Xe-135 and noble gases, chemical processing removes rare earths."
+    ],
+    [
+      "actinides_tritium.png",
+      "U-232 builds up through Th-232(n,2n); tritium falls as the initial Li-6 burns out."
+    ],
+    [
+      "leu_feed.png",
+      "Plutonium builds up from U-238 while LEU feed compensates burnup."
+    ],
+    [
+      "depletion_fidelity_ml.png",
+      "The fast lattice model tracks the 2D model; the ML-accelerated run reproduces the physics run."
+    ]
+  ],
+  "tables": [
+    [
+      "MSBR-like depletion (k_eff held at 1.000 by fissile feed/extraction)",
+      [
+        "processing",
+        "years",
+        "burnup [MWd/kgHM]",
+        "breeding ratio",
+        "fissile [kg]",
+        "net fissile gain [kg/yr]",
+        "Pa-233 [kg]",
+        "Xe absorption [%]",
+        "wall time [s]"
+      ],
+      [
+        [
+          "no processing",
+          "4.6",
+          "47",
+          "0.8402",
+          "2081",
+          "-246.9",
+          "82.1",
+          "1.732",
+          "2.5"
+        ],
+        [
+          "He sparging only",
+          "4.6",
+          "47",
+          "0.8919",
+          "1898",
+          "-165",
+          "86.8",
+          "0.009",
+          "2.3"
+        ],
+        [
+          "MSBR reference",
+          "4.6",
+          "47",
+          "1.0831",
+          "1450",
+          "31.2",
+          "7.4",
+          "0.01",
+          "2.3"
+        ]
+      ]
+    ],
+    [
+      "Depletion transport options",
+      [
+        "model",
+        "transport calls",
+        "wall time [s]",
+        "final BR",
+        "max |dBR| vs reference"
+      ],
+      [
+        [
+          "2D core (6 groups)",
+          "65",
+          "18.8",
+          "1.0915",
+          "reference"
+        ],
+        [
+          "2D-calibrated lattice",
+          "65",
+          "0.8",
+          "1.0967",
+          "0.0052"
+        ],
+        [
+          "ML-accelerated lattice",
+          "114 physics + 72 ML",
+          "1.6",
+          "1.083",
+          "0.00044"
+        ]
+      ]
+    ]
+  ],
+  "results": {
+    "msbr_BR_final": 1.0831083806840611,
+    "tritium_BOL_Ci_day": 11212.229859375238,
+    "tritium_EOL_Ci_day": 4171.315176392225,
+    "leu_feed_kg_per_year": 419.02322405754467
+  }
+}

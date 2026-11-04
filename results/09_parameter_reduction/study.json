@@ -1,0 +1,296 @@
+{
+  "name": "09_parameter_reduction",
+  "title": "9. Parameter reduction and reduced-order modelling",
+  "description": "Variance-based sensitivity on the GP surrogate identifies the few design parameters that matter; POD and PCA compress fields and cross-section tables.",
+  "figures": [
+    [
+      "sobol.png",
+      "UF4, ThF4 and salt fraction carry ~95% of the variance; fuel temperature, H/D and reflector thickness have S_T < 0.002."
+    ],
+    [
+      "morris.png",
+      "Screening with 600 surrogate evaluations reproduces the Sobol ranking."
+    ],
+    [
+      "active_subspace.png",
+      "A single linear combination of the nine inputs captures the trend of k_eff (1-D reduced model)."
+    ],
+    [
+      "reduced_inputs.png",
+      "The top 3 inputs carry 95% of the variance, but k spans ~+/-12,000 pcm, so even S_T = 0.002 is ~500 pcm: drop an input only if sqrt(S_T * Var) is below the accuracy target."
+    ],
+    [
+      "pod_spectrum.png",
+      "A handful of modes reproduces any power distribution in the design space."
+    ],
+    [
+      "pod_modes.png",
+      "Mode 1 is the fundamental shape; higher modes encode radial/axial tilts."
+    ],
+    [
+      "xs_functionalization.png",
+      "10 tabulated constants on a 4-D state grid replaced by 6 smooth functions."
+    ]
+  ],
+  "tables": [
+    [
+      "Sobol indices",
+      [
+        "parameter",
+        "k_eff S1",
+        "k_eff ST",
+        "CR S1",
+        "CR ST"
+      ],
+      [
+        [
+          "Salt volume fraction",
+          "0.1119",
+          "0.117",
+          "0.1412",
+          "0.1492"
+        ],
+        [
+          "UF4 [mol%]",
+          "0.6215",
+          "0.6257",
+          "0.5712",
+          "0.6031"
+        ],
+        [
+          "ThF4 [mol%]",
+          "0.2118",
+          "0.2135",
+          "0.2352",
+          "0.2651"
+        ],
+        [
+          "Core radius [cm]",
+          "0.01",
+          "0.0111",
+          "-0",
+          "0.0006"
+        ],
+        [
+          "H/D",
+          "0.0012",
+          "0.0013",
+          "0.0003",
+          "0.0003"
+        ],
+        [
+          "Reflector [cm]",
+          "0.0007",
+          "0.0009",
+          "-0",
+          "0.0002"
+        ],
+        [
+          "Channel radius [cm]",
+          "0.0189",
+          "0.0195",
+          "0.0144",
+          "0.0199"
+        ],
+        [
+          "Fuel temperature [K]",
+          "0.0001",
+          "0.0001",
+          "0",
+          "0.0001"
+        ],
+        [
+          "Li-6 [ppm]",
+          "0.0184",
+          "0.0201",
+          "0.0005",
+          "0.0008"
+        ]
+      ]
+    ],
+    [
+      "Leading active direction w1 (unit-cube coordinates)",
+      [
+        "parameter",
+        "weight"
+      ],
+      [
+        [
+          "UF4 [mol%]",
+          "0.8522"
+        ],
+        [
+          "ThF4 [mol%]",
+          "-0.4102"
+        ],
+        [
+          "Salt volume fraction",
+          "-0.2511"
+        ],
+        [
+          "Li-6 [ppm]",
+          "-0.1396"
+        ],
+        [
+          "Channel radius [cm]",
+          "0.1197"
+        ],
+        [
+          "Core radius [cm]",
+          "0.0852"
+        ],
+        [
+          "H/D",
+          "0.0286"
+        ],
+        [
+          "Reflector [cm]",
+          "0.0225"
+        ],
+        [
+          "Fuel temperature [K]",
+          "-0.0096"
+        ]
+      ]
+    ],
+    [
+      "Reduced-input surrogate accuracy",
+      [
+        "m",
+        "parameters kept",
+        "test RMSE [pcm]"
+      ],
+      [
+        [
+          "1",
+          "UF4 [mol%]",
+          "11818"
+        ],
+        [
+          "2",
+          "UF4 [mol%], ThF4 [mol%]",
+          "7796.4"
+        ],
+        [
+          "3",
+          "Salt volume fraction, UF4 [mol%], ThF4 [mol%]",
+          "4430.1"
+        ],
+        [
+          "4",
+          "Salt volume fraction, UF4 [mol%], ThF4 [mol%], Li-6 [ppm]",
+          "3619.8"
+        ],
+        [
+          "5",
+          "top 5",
+          "2433.6"
+        ],
+        [
+          "6",
+          "top 6",
+          "1321.4"
+        ],
+        [
+          "7",
+          "top 7",
+          "1128.3"
+        ],
+        [
+          "8",
+          "top 8",
+          "658.4"
+        ],
+        [
+          "9",
+          "top 9",
+          "528.1"
+        ]
+      ]
+    ],
+    [
+      "XS functionalization max relative error [%] (40 held-out states)",
+      [
+        "constant",
+        "polynomial",
+        "GP"
+      ],
+      [
+        [
+          "D1",
+          "0.0037",
+          "0.0029"
+        ],
+        [
+          "D2",
+          "0.0031",
+          "0.0019"
+        ],
+        [
+          "Sa1",
+          "0.0455",
+          "0.0366"
+        ],
+        [
+          "Sa2",
+          "0.1203",
+          "0.0904"
+        ],
+        [
+          "nSf1",
+          "0.0843",
+          "0.0871"
+        ],
+        [
+          "nSf2",
+          "0.1035",
+          "0.1272"
+        ],
+        [
+          "kSf1",
+          "0.0842",
+          "0.0871"
+        ],
+        [
+          "kSf2",
+          "0.1035",
+          "0.1272"
+        ],
+        [
+          "S12",
+          "0.337",
+          "0.0681"
+        ],
+        [
+          "S21",
+          "0.9361",
+          "0.1234"
+        ]
+      ]
+    ]
+  ],
+  "results": {
+    "k_eff_influential": [
+      "salt_fraction",
+      "uf4_pct",
+      "thf4_pct",
+      "core_radius",
+      "channel_radius",
+      "li6_ppm"
+    ],
+    "k_eff_negligible": [
+      "h_over_d",
+      "reflector",
+      "T_fuel"
+    ],
+    "k_eff_variance_pcm2": 379897774.5128676,
+    "droppable_for_3pct_accuracy": [
+      "T_fuel"
+    ],
+    "eig_ratio_2_1": 0.06224760599289668,
+    "pod_rank": 7,
+    "pod_compression": 85.71428571428571,
+    "pod_mean_max_err": 0.02298543983262356,
+    "pod_worst_err": 0.05901261305712402
+  }
+}

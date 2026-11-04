@@ -47,7 +47,7 @@ print(r.summary())                     # k_eff, beta_eff, Lambda, CR, peaking, g
 ```bash
 python examples/run_all.py             # every study + REPORT.md / report.html (~20 min, 4 cores)
 python examples/run_all.py 03 07       # selected studies
-python -m pytest                       # 67 verification tests (~25 s)
+python -m pytest                       # 68 verification tests (~25 s)
 ```
 
 The 45-group library is generated on first use (~6 s on 4 cores) and cached in
@@ -102,7 +102,7 @@ The 45-group library is generated on first use (~6 s on 4 cores) and cached in
 | GP surrogate, 240 training designs | R² = 0.9993, CV RMSE ≈ 530 pcm, calibrated 95 % intervals |
 | Multi-fidelity GP (learns 2D − lattice discrepancy) | **≈ 100 pcm** RMSE with 240 runs (vs 530 single-fidelity, 4,150 low-fidelity alone) |
 | Physics-guarded hybrid (σ < 150 pcm) | 96 % of queries answered by ML, 87 pcm RMSE |
-| Surrogate vs 2D solver cost | ~15,000× faster |
+| Surrogate vs 2D solver cost | more than 10,000× faster per evaluation |
 | ML-accelerated depletion | 1.6× fewer transport solves, ΔBR < 5e-4, Δk < 20 pcm |
 | Energy-group reduction 45 → 6 groups (2D) | 42 pcm |
 | POD of 2D power maps | 7 modes (86× compression), 2 % mean error on unseen designs |
@@ -151,6 +151,6 @@ msrnx/
   ml/           design space, surrogates, active learning, sensitivity, ROM,
                 multi-fidelity, UQ, optimization, XS functionalization, ML depletion
 examples/       10 studies + run_all.py (tables + charts + reports)
-tests/          67 verification tests
+tests/          68 verification tests
 results/        figures, study.json files, REPORT.md
 ```

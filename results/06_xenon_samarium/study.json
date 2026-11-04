@@ -1,0 +1,92 @@
+{
+  "name": "06_xenon_samarium",
+  "title": "6. Xenon and samarium poisoning with off-gas sparging",
+  "description": "One-group I/Xe/Pm/Sm balance on the inventory-averaged flux; worths calibrated against direct 2D transport calculations with the poison added to the salt.",
+  "figures": [
+    [
+      "xenon_sparging.png",
+      "Removing Xe on a ~1 minute time scale nearly eliminates xenon poisoning - a unique MSR advantage."
+    ],
+    [
+      "xenon_transients.png",
+      "The post-shutdown iodine pit that limits restart in solid-fuel reactors is suppressed by sparging."
+    ],
+    [
+      "samarium.png",
+      "Samarium worth rises to a new plateau after shutdown."
+    ]
+  ],
+  "tables": [
+    [
+      "Poison parameters (TMSR-LEU, 250 MWth)",
+      [
+        "quantity",
+        "value"
+      ],
+      [
+        [
+          "salt-averaged flux [n/cm2/s]",
+          "1.448e+14"
+        ],
+        [
+          "one-group sigma_a Xe-135 [b]",
+          "8.322e+05"
+        ],
+        [
+          "one-group sigma_a Sm-149 [b]",
+          "2.570e+04"
+        ],
+        [
+          "yields I-135 / Xe-135 / Pm-149",
+          "0.0628 / 0.0025 / 0.0108"
+        ],
+        [
+          "transport calibration factor",
+          "1.188"
+        ],
+        [
+          "equilibrium Xe worth, no sparging [pcm]",
+          "-2711.3"
+        ],
+        [
+          "equilibrium Sm worth [pcm]",
+          "-518.5"
+        ]
+      ]
+    ],
+    [
+      "Xenon after shutdown",
+      [
+        "case",
+        "equilibrium worth [pcm]",
+        "peak worth [pcm]",
+        "time of peak [h]"
+      ],
+      [
+        [
+          "no sparging",
+          "2711.3",
+          "6674.5",
+          "9.1"
+        ],
+        [
+          "sparging, 60 min",
+          "915.2",
+          "1081.7",
+          "1.2"
+        ],
+        [
+          "sparging, 5 min",
+          "110.4",
+          "110.4",
+          "0"
+        ]
+      ]
+    ]
+  ],
+  "results": {
+    "xe_eq_pcm": 2711.3475979335776,
+    "sm_eq_pcm": 518.4814798495114,
+    "sm_after_shutdown_pcm": 1050.282693842683
+  }
+}

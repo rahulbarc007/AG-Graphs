@@ -1,0 +1,225 @@
+{
+  "name": "03_core_analysis",
+  "title": "3. Full-core neutronics (2D R-Z multigroup diffusion)",
+  "description": "Lattice calculations per zone, 1D radial/axial 45-group spectral-zone calculations, condensation to 8 groups and 2D forward/adjoint diffusion.",
+  "figures": [
+    [
+      "rz_maps.png",
+      "Thermal flux peaks in the graphite reflector; power peaks in the well-moderated zone I."
+    ],
+    [
+      "adjoint_maps.png",
+      "Adjoint (importance) maps."
+    ],
+    [
+      "power_profiles.png",
+      "Mid-plane radial and radially averaged axial power shapes."
+    ],
+    [
+      "region_spectra.png",
+      "The under-moderated zone II and the salt plena have harder spectra than zone I."
+    ],
+    [
+      "design_comparison.png",
+      "Graphite-moderated cores have ~100x longer generation times than the fast chloride core; U-233 has the smallest beta."
+    ],
+    [
+      "group_condensation.png",
+      "Spectral-zone condensation keeps few-group errors small - a physics parameter reduction from 45 to a handful of groups."
+    ]
+  ],
+  "tables": [
+    [
+      "MSBR-like core: key results",
+      [
+        "quantity",
+        "value"
+      ],
+      [
+        [
+          "k_eff",
+          "1.1109"
+        ],
+        [
+          "excess reactivity [pcm]",
+          "9980"
+        ],
+        [
+          "k_inf zone I / zone II",
+          "1.1646 / 1.0069"
+        ],
+        [
+          "dominance ratio k1/k0",
+          "0.955"
+        ],
+        [
+          "beta_eff static [pcm]",
+          "271.6"
+        ],
+        [
+          "prompt generation time [us]",
+          "358.4"
+        ],
+        [
+          "conversion ratio (clean)",
+          "0.9088"
+        ],
+        [
+          "power peaking total / radial / axial",
+          "2.59 / 3.24 / 1.71"
+        ],
+        [
+          "average / peak power density [W/cc]",
+          "24.3 / 62.8"
+        ],
+        [
+          "power outside graphite zones",
+          "8.4 %"
+        ],
+        [
+          "neutron leakage from core zones",
+          "2.54 %"
+        ],
+        [
+          "peak graphite fast flux (>50 keV) [n/cm2/s]",
+          "3.638e+14"
+        ],
+        [
+          "graphite lifetime [full-power years at CF]",
+          "3.27"
+        ],
+        [
+          "tritium production [Ci/day]",
+          "9082.4"
+        ],
+        [
+          "solve time [s]",
+          "5.75"
+        ]
+      ]
+    ],
+    [
+      "Reference designs (clean, fresh fuel)",
+      [
+        "design",
+        "k_eff",
+        "beta_eff [pcm]",
+        "Lambda [us]",
+        "conv. ratio",
+        "peaking",
+        "fast flux peak",
+        "time [s]"
+      ],
+      [
+        [
+          "MSRE-like",
+          "1.0867",
+          "675.2",
+          "237",
+          "0.164",
+          "2.6",
+          "3.72e+13",
+          "0.1"
+        ],
+        [
+          "MSBR-like",
+          "1.1108",
+          "271.6",
+          "358.9",
+          "0.909",
+          "2.6",
+          "3.66e+14",
+          "0.77"
+        ],
+        [
+          "TMSR-LEU",
+          "1.0983",
+          "653.4",
+          "1199.9",
+          "0.28",
+          "1.92",
+          "1.00e+14",
+          "0.28"
+        ],
+        [
+          "Fast chloride MSR",
+          "1.1197",
+          "677.2",
+          "1",
+          "0.611",
+          "2.02",
+          "9.15e+14",
+          "0.22"
+        ]
+      ]
+    ],
+    [
+      "Energy-group condensation (MSRE-like core, 2D)",
+      [
+        "structure",
+        "groups",
+        "k_eff",
+        "error vs 45g [pcm]",
+        "2D solve [s]"
+      ],
+      [
+        [
+          "2g",
+          "2",
+          "1.0796",
+          "-632",
+          "0.024"
+        ],
+        [
+          "4g",
+          "4",
+          "1.0841",
+          "-179.7",
+          "0.037"
+        ],
+        [
+          "6g",
+          "6",
+          "1.0855",
+          "-42.4",
+          "0.055"
+        ],
+        [
+          "8g",
+          "8",
+          "1.0856",
+          "-30.9",
+          "0.088"
+        ],
+        [
+          "45g (reference)",
+          "45",
+          "1.0859",
+          "0",
+          "7.221"
+        ]
+      ]
+    ]
+  ],
+  "results": {
+    "k_eff": 1.1108646771469481,
+    "reactivity_pcm": 9980.034420725637,
+    "k_inf_zone1": 1.1645592537354927,
+    "dominance_ratio": 0.9550311231353482,
+    "beta_eff_static_pcm": 271.647836634387,
+    "generation_time_us": 358.3996588491498,
+    "conversion_ratio": 0.9087881549739045,
+    "leakage_fraction": 0.0132727597093113,
+    "core_leakage_fraction": 0.02543229916156282,
+    "power_peaking": 2.5889184943391363,
+    "radial_peaking": 3.2436401912733093,
+    "axial_peaking": 1.7125197608427343,
+    "q_avg_W_cm3": 24.257092700795095,
+    "q_max_W_cm3": 62.79963591198729,
+    "graphite_fast_flux_peak": 363753718786027.1,
+    "graphite_lifetime_years": 3.266779778889595,
+    "power_outside_zones": 0.08417437765413704,
+    "salt_avg_flux": 188295192407373.34,
+    "tritium_Ci_per_day": 9082.424183312638
+  }
+}

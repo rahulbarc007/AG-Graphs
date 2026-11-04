@@ -1,0 +1,117 @@
+{
+  "name": "02_lattice_physics",
+  "title": "2. Lattice physics: MSBR-type fuel channel in graphite",
+  "description": "Two-region collision-probability cell (Carlvik escape probability, Sauer Dancoff factor, Bell-Dancoff equivalence for self-shielding) with 45 energy groups.",
+  "figures": [
+    [
+      "moderation_curve.png",
+      "Under-moderated lattices (high salt fraction) trade reactivity for breeding."
+    ],
+    [
+      "heterogeneity.png",
+      "Lumping the fuel lowers sigma_0 and raises the resonance escape probability."
+    ],
+    [
+      "cell_spectra.png",
+      "Thermal disadvantage factor phi_mod/phi_fuel = 1.038."
+    ],
+    [
+      "neutron_economy.png",
+      "Th-232 and U-233 dominate absorption; Li-6/Li-7 are the main parasitic absorbers."
+    ]
+  ],
+  "tables": [
+    [
+      "MSBR zone-I cell (salt fraction 0.13, channel radius 1.0 cm, hex)",
+      [
+        "model",
+        "k_inf",
+        "eta",
+        "f",
+        "p",
+        "epsilon",
+        "conv. ratio",
+        "sigma0 Th [b]",
+        "B2_crit [1/cm2]"
+      ],
+      [
+        [
+          "heterogeneous (CP)",
+          "1.1646",
+          "1.4127",
+          "0.9338",
+          "0.7027",
+          "1.2563",
+          "0.852",
+          "204.4",
+          "3.892e-04"
+        ],
+        [
+          "homogenized mixture",
+          "1.0198",
+          "1.4129",
+          "0.9352",
+          "0.6059",
+          "1.2738",
+          "1.1282",
+          "840.8",
+          "5.032e-05"
+        ]
+      ]
+    ],
+    [
+      "Lumping effect",
+      [
+        "channel radius [cm]",
+        "k_inf",
+        "sigma0 Th [b]",
+        "Dancoff C"
+      ],
+      [
+        [
+          "0.3",
+          "1.0992",
+          "401.2",
+          "0.3903"
+        ],
+        [
+          "1.04",
+          "1.1665",
+          "199.7",
+          "0.1175"
+        ],
+        [
+          "1.78",
+          "1.1928",
+          "146.7",
+          "0.0528"
+        ],
+        [
+          "2.52",
+          "1.2078",
+          "122.5",
+          "0.0278"
+        ],
+        [
+          "3.26",
+          "1.2173",
+          "108.8",
+          "0.0159"
+        ],
+        [
+          "4",
+          "1.2237",
+          "100",
+          "0.0097"
+        ]
+      ]
+    ]
+  ],
+  "results": {
+    "k_inf_het": 1.1645592537354927,
+    "k_inf_hom": 1.0198219204634988,
+    "lumping_pcm": 12186.938887635912,
+    "thermal_disadvantage": 1.0383340882956211,
+    "optimum_salt_fraction": 0.06
+  }
+}

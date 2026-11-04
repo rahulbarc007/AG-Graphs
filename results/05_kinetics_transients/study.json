@@ -1,0 +1,103 @@
+{
+  "name": "05_kinetics_transients",
+  "title": "5. Circulating-fuel kinetics and transients",
+  "description": "Precursor drift from importance-weighted slug flow; multi-node circulating point kinetics with fuel/graphite feedback and an advected heat-exchanger loop.",
+  "figures": [
+    [
+      "beta_vs_flow.png",
+      "Long-lived precursor groups (1-3) decay mostly outside the core when the fuel circulates."
+    ],
+    [
+      "inhour.png",
+      "Period curves from the eigenvalues of the kinetics system."
+    ],
+    [
+      "transient_step.png",
+      "Negative temperature feedback turns the excursion over and settles at a new power level."
+    ],
+    [
+      "transient_ulof.png",
+      "Slower flow keeps precursors in-core (positive reactivity); fuel heating compensates and power falls to match heat removal."
+    ],
+    [
+      "transient_overcooling.png",
+      "The reactor follows the load: colder inlet salt adds reactivity and power rises until temperatures recover."
+    ],
+    [
+      "transient_scram.png",
+      "Circulation removes precursors from the core, so fission power falls faster after scram."
+    ]
+  ],
+  "tables": [
+    [
+      "MSRE reactivity loss from fuel circulation (U-235 fuel)",
+      [
+        "model",
+        "loss [pcm]"
+      ],
+      [
+        [
+          "uniform slug flow (tau_c 8.46 s, tau_L 16.73 s)",
+          "283.2"
+        ],
+        [
+          "importance-weighted, core + plena (MSR-NX geometry)",
+          "210.5"
+        ],
+        [
+          "MSRE measurement",
+          "about 212"
+        ]
+      ]
+    ],
+    [
+      "Transient summary (MSBR-like)",
+      [
+        "transient",
+        "peak power",
+        "final power",
+        "extreme fuel dT [K]"
+      ],
+      [
+        [
+          "+30 pcm step (circulating)",
+          "1.229",
+          "1.061",
+          "8.2"
+        ],
+        [
+          "+30 pcm step (stationary)",
+          "1.126",
+          "1.061",
+          "7.4"
+        ],
+        [
+          "unprotected loss of flow",
+          "1",
+          "0.137",
+          "35.1"
+        ],
+        [
+          "overcooling -40 K",
+          "1.371",
+          "1.341",
+          "-4.5"
+        ],
+        [
+          "scram -2000 pcm (circulating)",
+          "1",
+          "2.10e-03",
+          "-104.4"
+        ]
+      ]
+    ]
+  ],
+  "results": {
+    "msre_loss_uniform": 283.1854421266522,
+    "msre_loss_axial": 210.45221163463148,
+    "msbr_beta_static": 271.06880215362565,
+    "msbr_beta_circ": 159.72865226857982,
+    "rho0_circulation_pcm": 112.04413217492332,
+    "generation_time_s": 0.0003583431651612998
+  }
+}

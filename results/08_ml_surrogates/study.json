@@ -1,0 +1,331 @@
+{
+  "name": "08_ml_surrogates",
+  "title": "8. AI/ML surrogate modelling with accuracy control",
+  "description": "Nine-parameter thorium-breeder design space; high-fidelity data from the full 2D core sequence, low-fidelity data from lattice+B1.",
+  "figures": [
+    [
+      "model_comparison.png",
+      "Cross-validated accuracy of four surrogate families."
+    ],
+    [
+      "parity.png",
+      "Predicted vs physics on held-out designs."
+    ],
+    [
+      "learning_curves.png",
+      "Learning the discrepancy to a cheap physics model reaches ~100 pcm with a few hundred 2D runs."
+    ],
+    [
+      "guarded_hybrid.png",
+      "Accuracy is maintained by construction: uncertain queries fall back to physics and retrain the model."
+    ]
+  ],
+  "tables": [
+    [
+      "Design space (Latin hypercube, 300 high-fidelity 2D core solutions)",
+      [
+        "parameter",
+        "low",
+        "high",
+        "unit"
+      ],
+      [
+        [
+          "Salt volume fraction",
+          "0.08",
+          "0.4",
+          ""
+        ],
+        [
+          "UF4 [mol%]",
+          "0.15",
+          "0.6",
+          "mol%"
+        ],
+        [
+          "ThF4 [mol%]",
+          "6",
+          "14",
+          "mol%"
+        ],
+        [
+          "Core radius [cm]",
+          "120",
+          "260",
+          "cm"
+        ],
+        [
+          "H/D",
+          "0.7",
+          "1.5",
+          ""
+        ],
+        [
+          "Reflector [cm]",
+          "20",
+          "80",
+          "cm"
+        ],
+        [
+          "Channel radius [cm]",
+          "0.5",
+          "3",
+          "cm"
+        ],
+        [
+          "Fuel temperature [K]",
+          "850",
+          "1000",
+          "K"
+        ],
+        [
+          "Li-6 [ppm]",
+          "5",
+          "500",
+          "ppm"
+        ]
+      ]
+    ],
+    [
+      "Response ranges in the dataset",
+      [
+        "output",
+        "min",
+        "max"
+      ],
+      [
+        [
+          "k_eff",
+          "0.7759",
+          "1.6673"
+        ],
+        [
+          "conversion_ratio",
+          "0.2419",
+          "1.7186"
+        ],
+        [
+          "alpha_fuel",
+          "-12.207",
+          "-1.3216"
+        ],
+        [
+          "power_peaking",
+          "1.3713",
+          "2.5459"
+        ],
+        [
+          "graphite_life",
+          "1.0969",
+          "21.036"
+        ],
+        [
+          "fissile_kg",
+          "353.72",
+          "5287"
+        ],
+        [
+          "leakage",
+          "0.0207",
+          "0.1432"
+        ]
+      ]
+    ],
+    [
+      "5-fold cross-validation (240 training designs)",
+      [
+        "output",
+        "model",
+        "RMSE",
+        "max |err|",
+        "R2",
+        "95% coverage"
+      ],
+      [
+        [
+          "k_eff",
+          "Gaussian process",
+          "534.44",
+          "2784.2",
+          "0.99925",
+          "0.96"
+        ],
+        [
+          "k_eff",
+          "deep ensemble",
+          "973.84",
+          "4378.4",
+          "0.99751",
+          "0.84"
+        ],
+        [
+          "k_eff",
+          "gradient boosting",
+          "5235.9",
+          "15218",
+          "0.92816",
+          "0.68"
+        ],
+        [
+          "k_eff",
+          "polynomial ridge",
+          "1818",
+          "6040.4",
+          "0.99134",
+          "0.75"
+        ],
+        [
+          "conversion_ratio",
+          "Gaussian process",
+          "0.0074",
+          "0.0328",
+          "0.99931",
+          "0.88"
+        ],
+        [
+          "conversion_ratio",
+          "deep ensemble",
+          "0.0093",
+          "0.045",
+          "0.99892",
+          "0.85"
+        ],
+        [
+          "conversion_ratio",
+          "gradient boosting",
+          "0.069",
+          "0.2433",
+          "0.94085",
+          "0.78"
+        ],
+        [
+          "conversion_ratio",
+          "polynomial ridge",
+          "0.038",
+          "0.1323",
+          "0.98209",
+          "0.98"
+        ],
+        [
+          "alpha_fuel",
+          "Gaussian process",
+          "0.1493",
+          "0.728",
+          "0.99409",
+          "0.93"
+        ],
+        [
+          "alpha_fuel",
+          "deep ensemble",
+          "0.18",
+          "0.7689",
+          "0.99141",
+          "0.84"
+        ],
+        [
+          "alpha_fuel",
+          "gradient boosting",
+          "0.7254",
+          "3.1241",
+          "0.86054",
+          "0.71"
+        ],
+        [
+          "alpha_fuel",
+          "polynomial ridge",
+          "0.3172",
+          "1.6198",
+          "0.97333",
+          "1"
+        ]
+      ]
+    ],
+    [
+      "Multi-fidelity accuracy (k_eff test RMSE, pcm)",
+      [
+        "HF samples",
+        "single-fidelity GP",
+        "multi-fidelity GP",
+        "LF model alone"
+      ],
+      [
+        [
+          "15",
+          "6211.2",
+          "580",
+          "4155.3"
+        ],
+        [
+          "30",
+          "2834.8",
+          "885.2",
+          "4155.3"
+        ],
+        [
+          "60",
+          "1782.3",
+          "339.7",
+          "4155.3"
+        ],
+        [
+          "120",
+          "774.7",
+          "180.9",
+          "4155.3"
+        ],
+        [
+          "240",
+          "528.1",
+          "103.9",
+          "4155.3"
+        ]
+      ]
+    ],
+    [
+      "Cost per design evaluation",
+      [
+        "model",
+        "seconds",
+        "relative"
+      ],
+      [
+        [
+          "2D core (6 groups, 4 processes)",
+          "0.1566",
+          "1"
+        ],
+        [
+          "lattice + B1 (low fidelity)",
+          "0.00305",
+          "51.4"
+        ],
+        [
+          "Gaussian-process surrogate",
+          "6.51e-06",
+          "24063x faster"
+        ]
+      ]
+    ]
+  ],
+  "results": {
+    "gp_test_rmse_k_eff": 528.1261395040494,
+    "gp_test_r2_k_eff": 0.9990678819520152,
+    "gp_test_rmse_conversion_ratio": 0.0049544726477385075,
+    "gp_test_r2_conversion_ratio": 0.9995708263842529,
+    "gp_test_rmse_alpha_fuel": 0.1293839521475936,
+    "gp_test_r2_alpha_fuel": 0.994170914578631,
+    "mf_rmse_240": 103.85273195387452,
+    "sf_rmse_240": 528.1261395040494,
+    "lf_rmse": 4155.289180395624,
+    "al_rmse": {
+      "imse": 715.6525580578077,
+      "max_std": 1010.7290942442561,
+      "random": 864.7806872320471
+    },
+    "guarded_ml_fraction": 0.9625,
+    "guarded_ml_rmse_pcm": 86.64861369640768,
+    "guarded_max_err_pcm": 380.8365449621931,
+    "t_hf_s": 0.15663188298543293,
+    "t_lf_s": 0.0030451560020446776
+  }
+}

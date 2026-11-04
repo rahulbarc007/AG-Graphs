@@ -96,8 +96,10 @@ for i in range(len(Xr)):
 fig, ax = pl.figure(1, 1, (7.6, 4.2), "Constrained Bayesian optimization of the breeding ratio",
                     "Maximize CR subject to k_eff >= 1.02 and alpha_fuel <= -3 pcm/K (each point = one 2D core solve)")
 n_bo = np.arange(20, 20 + len(bo.best_feasible))
-ax.plot(n_bo, bo.best_feasible, "o-", color=pl.SERIES[0], label="Bayesian optimization (EI x P(feasible))", markersize=4)
-ax.plot(np.arange(1, len(best_r) + 1), best_r, color=pl.SERIES[1], label="random search")
+best_r = np.where(np.isfinite(best_r), best_r, np.nan)
+ax.step(n_bo, bo.best_feasible, where="post", color=pl.SERIES[0],
+        label="Bayesian optimization (EI x P(feasible)), after 20-run LHS start")
+ax.step(np.arange(1, len(best_r) + 1), best_r, where="post", color=pl.SERIES[1], label="random search")
 pl.end_label(ax, n_bo[-1], bo.best_feasible[-1], f"CR = {bo.best_feasible[-1]:.3f}")
 ax.set_xlabel("number of physics evaluations")
 ax.set_ylabel("best feasible conversion ratio")
@@ -144,19 +146,30 @@ for it in range(2):
         Ytrain[o] = np.append(Ytrain[o], ver[o])
     models = {o: make_surrogate("gp", MSR_SPACE).fit(Xtrain, Ytrain[o]) for o in outs}
 front, ver = passes[-1]
+ok = ((ver["k_eff"] >= 1.02) & (ver["alpha_fuel"] <= -3.0)
+      & (ver["conversion_ratio"] >= targets - 0.005))
 fig, ax = pl.figure(1, 1, (7.8, 4.4), "Pareto front: breeding vs fissile inventory",
                     "Robust surrogate optima (constraints on mean - 1.5 sigma), refined once and verified with the 2D solver")
 ax.scatter(D["fissile_kg"], D["conversion_ratio"], s=10, color=pl.GRID, label="training designs", zorder=1)
-ax.plot([f["prediction"]["fissile_kg"] for f in front], [f["prediction"]["conversion_ratio"] for f in front], "o-",
-        color=pl.SERIES[0], label="surrogate optimum", zorder=3)
-ax.scatter(ver["fissile_kg"], ver["conversion_ratio"], s=60, facecolor="none", edgecolor=pl.SERIES[1], linewidth=2,
-           label="physics verification", zorder=4)
+ax.plot([f["prediction"]["fissile_kg"] for f, m in zip(front, ok) if m],
+        [f["prediction"]["conversion_ratio"] for f, m in zip(front, ok) if m], "o-",
+        color=pl.SERIES[0], label="surrogate optimum (feasible)", zorder=3)
+ax.scatter(ver["fissile_kg"][ok], ver["conversion_ratio"][ok], s=60, facecolor="none", edgecolor=pl.SERIES[1],
+           linewidth=2, label="physics verification", zorder=4)
+if (~ok).any():
+    ax.scatter(ver["fissile_kg"][~ok], ver["conversion_ratio"][~ok], s=50, marker="x", color=pl.INK2,
+               linewidth=1.6, label="target not attainable (k_eff < 1.02)", zorder=4)
 ax.set_xlabel("U-233 inventory [kg]")
 ax.set_ylabel("conversion ratio")
 ax.set_xscale("log")
-ax.legend(loc="lower right")
+from matplotlib.ticker import NullFormatter, ScalarFormatter
+ax.set_xticks([300, 500, 1000, 2000, 5000])
+ax.xaxis.set_major_formatter(ScalarFormatter())
+ax.xaxis.set_minor_formatter(NullFormatter())
+ax.legend(loc="lower right", fontsize=8)
 S.add_figure(pl.save(fig, S.path("pareto.png")),
-             "Every extra unit of breeding costs fissile inventory; the 2D solver confirms the surrogate optima.")
+             "Every extra unit of breeding costs fissile inventory; the 2D solver confirms the feasible optima, and both "
+             "model and physics agree that CR >= 1.14 cannot be reached with k_eff >= 1.02 in this design space.")
 rows = []
 for p_i, (fr, vv) in enumerate(passes):
     for i, (c, f) in enumerate(zip(targets, fr)):

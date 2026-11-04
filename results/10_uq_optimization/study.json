@@ -1,0 +1,337 @@
+{
+  "name": "10_uq_optimization",
+  "title": "10. Uncertainty quantification and design optimization",
+  "description": "Direct-perturbation sensitivities on the full 2D core, Monte Carlo propagation through Gaussian-process surrogates, and constrained Bayesian optimization.",
+  "figures": [
+    [
+      "nd_sensitivity.png",
+      "Th-232 capture dominates, then U-233 nu/fission/capture; graphite and carrier-salt (Li-7, F-19, Be-9) data add the rest."
+    ],
+    [
+      "tolerance_uq.png",
+      "Fissile loading and salt-fraction tolerances drive the k_eff spread."
+    ],
+    [
+      "bayesian_optimization.png",
+      "Bayesian optimization finds better feasible designs with fewer expensive runs."
+    ],
+    [
+      "pareto.png",
+      "Every extra unit of breeding costs fissile inventory; the 2D solver confirms the feasible optima, and both model and physics agree that CR >= 1.14 cannot be reached with k_eff >= 1.02 in this design space."
+    ]
+  ],
+  "tables": [
+    [
+      "Nuclear-data sensitivity (2D core, 2% perturbations)",
+      [
+        "nuclide reaction",
+        "S",
+        "rel. unc.",
+        "contribution [pcm]"
+      ],
+      [
+        [
+          "Th232 capture",
+          "-0.484",
+          "0.02",
+          "967.9"
+        ],
+        [
+          "U233 nu",
+          "0.9972",
+          "0.003",
+          "299.2"
+        ],
+        [
+          "U233 fission",
+          "0.4797",
+          "0.006",
+          "287.8"
+        ],
+        [
+          "U233 capture",
+          "-0.054",
+          "0.03",
+          "162.1"
+        ],
+        [
+          "C12 capture",
+          "-0.0252",
+          "0.05",
+          "125.9"
+        ],
+        [
+          "C12 elastic",
+          "0.1581",
+          "0.005",
+          "79"
+        ],
+        [
+          "Li7 capture",
+          "-0.0114",
+          "0.05",
+          "57.2"
+        ],
+        [
+          "F19 capture",
+          "-0.0052",
+          "0.08",
+          "41.2"
+        ],
+        [
+          "Be9 n2n",
+          "0.0023",
+          "0.08",
+          "18.6"
+        ],
+        [
+          "F19 elastic",
+          "0.0089",
+          "0.02",
+          "17.8"
+        ],
+        [
+          "Li6 nalpha",
+          "-0.0118",
+          "0.005",
+          "5.9"
+        ],
+        [
+          "Be9 capture",
+          "-0.0004",
+          "0.1",
+          "4.3"
+        ],
+        [
+          "F19 inelastic",
+          "0.0002",
+          "0.1",
+          "1.9"
+        ],
+        [
+          "Th232 elastic",
+          "0.0009",
+          "0.02",
+          "1.8"
+        ]
+      ]
+    ],
+    [
+      "Best design found by Bayesian optimization (verified by physics)",
+      [
+        "quantity",
+        "value"
+      ],
+      [
+        [
+          "Salt volume fraction",
+          "0.3784"
+        ],
+        [
+          "UF4 [mol%]",
+          "0.3105"
+        ],
+        [
+          "ThF4 [mol%]",
+          "13.401"
+        ],
+        [
+          "Core radius [cm]",
+          "253.76"
+        ],
+        [
+          "H/D",
+          "0.9039"
+        ],
+        [
+          "Reflector [cm]",
+          "76.488"
+        ],
+        [
+          "Channel radius [cm]",
+          "1.9414"
+        ],
+        [
+          "Fuel temperature [K]",
+          "987.41"
+        ],
+        [
+          "Li-6 [ppm]",
+          "9.0878"
+        ],
+        [
+          "k_eff",
+          "1.0206"
+        ],
+        [
+          "conversion ratio",
+          "1.0986"
+        ],
+        [
+          "alpha_fuel [pcm/K]",
+          "-6.663"
+        ],
+        [
+          "U-233 inventory [kg]",
+          "2249.8"
+        ]
+      ]
+    ],
+    [
+      "Pareto designs: surrogate vs physics (pass 1 = initial, pass 2 = after refinement)",
+      [
+        "pass",
+        "CR target",
+        "CR (ML)",
+        "CR (physics)",
+        "k_eff (ML)",
+        "k_eff (physics)",
+        "U-233 kg (ML)",
+        "U-233 kg (physics)",
+        "feasible (physics)"
+      ],
+      [
+        [
+          "1",
+          "0.9",
+          "0.9301",
+          "0.9383",
+          "1.0317",
+          "1.0187",
+          "366",
+          "369",
+          "no"
+        ],
+        [
+          "1",
+          "0.96",
+          "0.9726",
+          "0.9732",
+          "1.0264",
+          "1.0196",
+          "455",
+          "454",
+          "no"
+        ],
+        [
+          "1",
+          "1.02",
+          "1.024",
+          "1.0206",
+          "1.0269",
+          "1.0264",
+          "614",
+          "615",
+          "yes"
+        ],
+        [
+          "1",
+          "1.08",
+          "1.0892",
+          "1.0835",
+          "1.0242",
+          "1.0199",
+          "1077",
+          "1078",
+          "no"
+        ],
+        [
+          "1",
+          "1.14",
+          "1.1502",
+          "1.1472",
+          "0.9893",
+          "0.9886",
+          "1945",
+          "1945",
+          "no"
+        ],
+        [
+          "1",
+          "1.2",
+          "1.2125",
+          "1.2103",
+          "0.9685",
+          "0.9657",
+          "1838",
+          "1841",
+          "no"
+        ],
+        [
+          "2",
+          "0.9",
+          "0.915",
+          "0.9114",
+          "1.0249",
+          "1.0207",
+          "347",
+          "347",
+          "yes"
+        ],
+        [
+          "2",
+          "0.96",
+          "0.9706",
+          "0.9636",
+          "1.0259",
+          "1.0228",
+          "435",
+          "433",
+          "yes"
+        ],
+        [
+          "2",
+          "1.02",
+          "1.0283",
+          "1.0257",
+          "1.0232",
+          "1.0246",
+          "631",
+          "631",
+          "yes"
+        ],
+        [
+          "2",
+          "1.08",
+          "1.0878",
+          "1.0873",
+          "1.0243",
+          "1.0245",
+          "1454",
+          "1451",
+          "yes"
+        ],
+        [
+          "2",
+          "1.14",
+          "1.1474",
+          "1.1428",
+          "0.9931",
+          "0.9936",
+          "1800",
+          "1795",
+          "no"
+        ],
+        [
+          "2",
+          "1.2",
+          "1.209",
+          "1.2063",
+          "0.9669",
+          "0.9672",
+          "1495",
+          "1496",
+          "no"
+        ]
+      ]
+    ]
+  ],
+  "results": {
+    "nd_total_uncertainty_pcm": 1078.5751702883604,
+    "mc_k_mean": 1.1809214728014001,
+    "mc_k_std_pcm": 828.6501389534419,
+    "bo_best_cr": 1.0986117264287791,
+    "random_best_cr": 0.9929236060071579,
+    "pareto_feasible_fraction": 0.6666666666666666
+  }
+}

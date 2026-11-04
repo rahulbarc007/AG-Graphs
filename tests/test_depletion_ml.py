@@ -68,3 +68,23 @@ def test_pod_reconstruction():
     pod = PODModel(energy=0.99999, space=sp).fit(X, S)
     assert pod.rank < 10
     assert np.abs(pod.project(S) - S).max() < 1e-2
+
+
+def test_constrained_surrogate_optimize_respects_constraints():
+    from msrnx.ml import surrogate_optimize
+    sp = DesignSpace([Parameter("x", 0.0, 1.0), Parameter("y", 0.0, 1.0)])
+
+    def pred(Z):
+        Z = np.atleast_2d(Z)
+        return {"f": (Z[:, 0] - 0.3) ** 2 + (Z[:, 1] - 0.2) ** 2, "g": Z[:, 0] + Z[:, 1]}
+
+    r = surrogate_optimize(pred, sp, lambda p: p["f"], constraints=[("g", ">=", 1.2)],
+                           seed=0, maxiter=80, popsize=15)
+    assert r["prediction"]["g"] >= 1.2 - 1e-6           # feasible
+    # analytic optimum on the line x + y = 1.2: (0.65, 0.55)
+    assert np.allclose(r["x"], [0.65, 0.55], atol=0.03)
+    # robust version: constraint on the bound mean - 2*sigma with sigma = 0.05
+    pstd = lambda Z: {k: (v, np.full_like(v, 0.05)) for k, v in pred(Z).items()}
+    rr = surrogate_optimize(pred, sp, lambda p: p["f"], constraints=[("g", ">=", 1.2)],
+                            seed=0, maxiter=80, popsize=15, predict_std=pstd, kappa=2.0)
+    assert rr["prediction"]["g"] >= 1.3 - 1e-6           # margin of kappa*sigma

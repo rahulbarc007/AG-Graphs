@@ -1,0 +1,146 @@
+{
+  "name": "04_reactivity_control",
+  "title": "4. Reactivity feedback, control rods and criticality",
+  "description": "All coefficients by central differences of full 2D core solutions; Doppler and density components separated by freezing either the cross sections or the density.",
+  "figures": [
+    [
+      "temperature_coefficients.png",
+      "Doppler dominates for the thorium breeder; salt expansion dominates for the small MSRE core."
+    ],
+    [
+      "reactivity_vs_temperature.png",
+      "Reactivity falls with fuel temperature and with helium voiding of the salt."
+    ],
+    [
+      "rod_worth.png",
+      "Differential worth peaks where the flux-importance product is largest."
+    ],
+    [
+      "criticality_search.png",
+      "Every point is a full 2D core solution."
+    ]
+  ],
+  "tables": [
+    [
+      "Temperature coefficients of reactivity [pcm/K]",
+      [
+        "design",
+        "fuel Doppler",
+        "fuel density",
+        "fuel total",
+        "graphite",
+        "isothermal"
+      ],
+      [
+        [
+          "MSRE-like",
+          "-2.4",
+          "-4.53",
+          "-6.93",
+          "-4.7",
+          "-11.63"
+        ],
+        [
+          "MSBR-like",
+          "-3.78",
+          "0.45",
+          "-3.33",
+          "-0.88",
+          "-4.21"
+        ],
+        [
+          "TMSR-LEU",
+          "-3.86",
+          "-2.62",
+          "-6.47",
+          "-4.71",
+          "-11.19"
+        ]
+      ]
+    ],
+    [
+      "Comparison with historical values [pcm/K]",
+      [
+        "quantity",
+        "MSR-NX",
+        "reported"
+      ],
+      [
+        [
+          "MSRE fuel salt",
+          "-6.93",
+          "about -8.7"
+        ],
+        [
+          "MSRE graphite",
+          "-4.7",
+          "about -6.7"
+        ],
+        [
+          "MSBR fuel salt",
+          "-3.33",
+          "about -3.2"
+        ],
+        [
+          "MSBR graphite",
+          "-0.88",
+          "about +2.3 (free-gas graphite omits S(a,b))"
+        ]
+      ]
+    ],
+    [
+      "Control rod and shutdown margin (MSRE-like, 3 identical rods, one stuck out)",
+      [
+        "quantity",
+        "value"
+      ],
+      [
+        [
+          "single-rod worth [pcm]",
+          "4729.5"
+        ],
+        [
+          "excess reactivity [pcm]",
+          "7977.5"
+        ],
+        [
+          "available worth, stuck rod [pcm]",
+          "9459.1"
+        ],
+        [
+          "shutdown margin [pcm]",
+          "1481.6"
+        ]
+      ]
+    ]
+  ],
+  "results": {
+    "coefficients": {
+      "MSRE-like": {
+        "fuel_total": -6.926187704843878,
+        "fuel_doppler": -2.3970705196282305,
+        "fuel_density": -4.528508468166881,
+        "graphite": -4.702439672928604,
+        "isothermal": -11.630386555041783
+      },
+      "MSBR-like": {
+        "fuel_total": -3.334636957105785,
+        "fuel_doppler": -3.784335773799885,
+        "fuel_density": 0.45112835009353264,
+        "graphite": -0.8784655478489833,
+        "isothermal": -4.2128618983888755
+      },
+      "TMSR-LEU": {
+        "fuel_total": -6.471845561017542,
+        "fuel_doppler": -3.8554630672460455,
+        "fuel_density": -2.6159516788438752,
+        "graphite": -4.711651771319714,
+        "isothermal": -11.187309709695615
+      }
+    },
+    "void_coefficient_pcm_per_pct": 17.340750013899935,
+    "rod_worth_pcm": 4729.538333834315,
+    "shutdown_margin_pcm": 1481.5836874923953,
+    "critical_uf4_molpct": 0.7974417684157601
+  }
+}
